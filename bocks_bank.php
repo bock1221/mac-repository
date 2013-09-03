@@ -37,7 +37,7 @@ $obj = new program;
         }
         class register extends page {
                 public function get() {
-                        echo 'register' . "<br> \n";
+                        echo 'Hi please register now' . "<br> \n";
                         //echo '<a href="mypage_class.php?class=register">register</a>' . "<br> \n";
                         //echo '<a href="mypage_class.php?class=form2">Form 2</a>' . "<br> \n";
                         //echo '<a href="mypage_class.php">Homepage</a>' . "<br> \n";
@@ -45,13 +45,14 @@ $obj = new program;
                        
                      		$form = '<FORM action="bocks_bank.php?class=register" method="post">
                      				<P>
+                     				
                      				<LABEL for="firstname">First name: </LABEL>
                      				<INPUT type="text" name="firstname" id="firstname"><BR>
                      				<LABEL for="lastname">Last name: </LABEL>
                      				<INPUT type="text" name="lastname" id="lastname"><BR>
-                     				<LABEL for="email">email: </LABEL>
-                     				<INPUT type="text" name="email"id="email"><BR>
-                     				<LABEL for="password">password: </LABEL>
+                     				<LABEL for="username">Username: </LABEL>
+                     				<INPUT type="text" name="username"id="username"><BR>
+                     				<LABEL for="password">Password: </LABEL>
                      				<INPUT type="password" name="password"id="password"><BR>
                      				<INPUT type="submit" value="Send"> <INPUT type="reset">
                      				</P>
@@ -63,7 +64,8 @@ $obj = new program;
                 $obj = new writeinfo;
                // $this->$login = $login_form;
                // echo $login;
-                $obj->write();   				
+                $obj->write(); 
+               
                 }
                      				
         }
@@ -82,7 +84,8 @@ $obj = new program;
            echo "login to get free money";
                      				
             $login_form = '<FORM action ="bocks_bank.php?class=login" method="post">
-                     				            <p>Your email <input type="text"name="email">
+            		
+                     				            <p>Your Username <input type="text"name="username">
                      				            <p>Your password enter now <input type="text"name="password">
                      				            <input type ="submit" name="submit" value ="Submit Now"/>';
           echo $login_form;
@@ -96,7 +99,7 @@ $obj = new program;
         }
                      				
         class debitcredit extends page {
-                public function __construct() {
+                public function post() {
                         $form = '<br>
                   <FORM action="bocks_bank.php?page=bankform" method="post">
                    <fieldset>
@@ -113,20 +116,37 @@ $obj = new program;
 
                         echo $form;
                 }
-                public function post(){
+              /*  public function post(){
                 $obj = new writeinfo;
                   $obj->write();     // $this->$login = $login_form;
                // echo $login;
-
-                        }
+              
+                        }*/
         
         }
         class writeinfo  {
                    
                    
           public function write() {
+           	$first =$_POST['firstname'];
+          	$last= $_POST['lastname'];
+          	$username=$_POST['username'];
+          	$password=$_POST['password'];
+          	if($first==NULL || $last==NULL || $username==NULL || $password==NULL){
+            
+                 
+                
+                 echo 'Hi please register now thanks' . "<br> \n";
+                 echo'please fill in all fields'."<br> \n" ;
+                 echo '<a href="bocks_bank.php?class=register">register</a>' . "<br> \n";
+                 //echo '<a href="mypage_class.php?class=form2">Form 2</a>' . "<br> \n";
+                 //echo '<a href="mypage_class.php">Homepage</a>' . "<br> \n";
+                 
+                 
+                
+          	}else{
           	
-          	$id = $_POST['email'];
+          	$id = $_POST['username'];
           	// $car = array('firstname', 'lastname', 'username' , 'password');
           	//// $cat = array('firstname', 'lastname', 'username' , 'password') ;
           	// $combine =  array_combine($keys,$_POST);  
@@ -135,34 +155,56 @@ $obj = new program;
            //  $combine[]=$cat;
             
              if(@$handle=fopen("write/$id.csv", 'r')) {
-             echo "this username is already taken";	
+             echo "this username is already taken";
+             echo '<a href="bocks_bank.php?class=register">register now</a>' . "<br> \n";
              
              	
              }else{
-          	 $id = $_POST['email'];
+          	 $id = $_POST['username'];
              //print_r($combine);
             // foreach($combine as){
              	
             // }
              $username = fopen("write/$id.csv", 'w');
              fputcsv($username ,$_POST );
+             echo'you are now registerd';
+             echo '<a href="bocks_bank.php?class=login">Login Now</a>' . "<br> \n";
                 //print_r($combine);   
                    }
+              }
           }
                    public function read_login(){
-                   	$id =$_POST['email'];
+                   	$id =$_POST['username'];
+                   	
                    $row = 1;
-                   if (($handle = fopen("write/$id", "r")) !== FALSE) {
+                   if (($handle = fopen("write/$id.csv", "r")) !== FALSE) {
                    	while (($record = fgetcsv($handle, 0, ",")) !== FALSE) {
                    		if($row == 1) {
                    			$keys = $record;
                    			$row++;
-                   			print_r($record);
+                  ; 			print_r($record); 
+                   			
+                   			$pass = $record['3']; 
+                   			if($pass == $_POST['password']){
+                   				$obj = new form2;
+                   			}
+                   		
+                   		
+                   			
+                   	      // print_r($pass);
+                   	       
+                   			
+                   			
+                   			
                 }
                    	}
                       }
-                         }
-        }
+                      fclose($handle);
+                      //$pass = array_slice($record,3,1);
+                    //  echo "$pass";
+                      }
+        
+                     }
                             
     ?>
                                       
