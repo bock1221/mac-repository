@@ -17,6 +17,7 @@ $obj = new program;
                 }
         }
         class page {
+        	  
                 public function __construct() {
                         if($_SERVER['REQUEST_METHOD'] == 'GET') {
                                 $this->get();
@@ -32,7 +33,11 @@ $obj = new program;
                 }
 
                 protected function post() {
-                        //print_r($_POST);
+                	echo "welcome to a bank<br>";
+                	echo '<a href="bocks_bank.php?class=register">register now</a>' . "<br> \n";
+                	//echo '<a href="mypage_class.php?class=form2">Form 2</a>' . "<br> \n";
+                	echo '<a href="bocks_bank.php?class=login">Login Now</a>' . "<br> \n";
+                	print_r($_POST);
                 }
         }
         class register extends page {
@@ -70,12 +75,19 @@ $obj = new program;
                      				
         }
         class form2 extends page {
+        	    
+        	
+        	     
                 public function __construct() {
-                        echo 'Form 2' . "<br> \n";
-                        echo '<a href="bocks_bank.php.php?class=register">Form 1</a>' . "<br> \n";
-                        echo '<a href="bocks_bank.php.php?class=form2">Form 2</a>' . "<br> \n";
-                        echo '<a href="bocks_bank.php.php">Homepage</a>' . "<br> \n";
+                	//print_r($_SESSION);
+                $user=$_SESSION['userinfo']; 
+                	$users=$user [1];  
+                        echo "hi $users are now logged in" . "<br> \n";
+                        echo '<a href="bocks_bank.php?class=debitcredit">New transaction</a>' . "<br> \n";
+                        echo '<a href="bocks_bank.php?class=veiw_balance">Veiw balance </a>' . "<br> \n";
+                        echo '<a href="bocks_bank.php">Homepage</a>' . "<br> \n";
                 }
+                
         }
         class homepage extends page {}
                      				
@@ -99,29 +111,39 @@ $obj = new program;
         }
                      				
         class debitcredit extends page {
-                public function post() {
+                public function get() {
                         $form = '<br>
-                  <FORM action="bocks_bank.php?page=bankform" method="post">
+                  <FORM action="bocks_bank.php?class=debitcredit" method="post">
                    <fieldset>
                     <LABEL for="amount">Amount: </LABEL>
-                   <INPUT type="text" name="amount" id="lastname"><BR>
+                   <INPUT type="text" name="amount" id="amount"><BR>
                     <LABEL for="source">Source: </LABEL>
-                   <INPUT type="text" name="source" id="lastname"><BR>
+                   <INPUT type="text" name="source" id="source"><BR>
                      				
                     <INPUT type="radio" name="type" value="debit"> Debit<BR>
-                   <INPUT type="text" name="password"id="password"><BR>
+                    <INPUT type="radio" name="type" value="credit"> Credit<BR>
+                  
                    <INPUT type="submit" value="Send"> <INPUT type="reset">
                      </P>
                      </FORM>';
 
                         echo $form;
+                       session_start();
+                       //print_r($_POST);
+                       //session_start();
+                       print_r($_SESSION);
                 }
-              /*  public function post(){
-                $obj = new writeinfo;
-                  $obj->write();     // $this->$login = $login_form;
-               // echo $login;
+                public function post(){ 
+                	//$transactions = new transactions;
+                $transactions =	new transactions;
+                $transactions->addTransaction($_POST['type'],$_POST['amount'],$_POST['source']);
+               print_r($_SESSION);
+               
+                
+                
               
-                        }*/
+              
+                        }
         
         }
         class writeinfo  {
@@ -167,7 +189,7 @@ $obj = new program;
             // }
              $username = fopen("write/$id.csv", 'w');
              fputcsv($username ,$_POST );
-             echo'you are now registerd';
+             echo'you are now registerd'. '<br>';
              echo '<a href="bocks_bank.php?class=login">Login Now</a>' . "<br> \n";
                 //print_r($combine);   
                    }
@@ -176,17 +198,37 @@ $obj = new program;
                    public function read_login(){
                    	$id =$_POST['username'];
                    	
-                   $row = 1;
-                   if (($handle = fopen("write/$id.csv", "r")) !== FALSE) {
-                   	while (($record = fgetcsv($handle, 0, ",")) !== FALSE) {
-                   		if($row == 1) {
-                   			$keys = $record;
-                   			$row++;
-                  ; 			print_r($record); 
-                   			
-                   			$pass = $record['3']; 
-                   			if($pass == $_POST['password']){
+                  // $row = 1;
+                   
+                   if ((@$handle = fopen("write/$id.csv", "r")) == FALSE) { 
+                   	echo 'your user name is incorrect';
+                   	echo '<a href="bocks_bank.php?class=login">Login Now</a>' . "<br> \n";
+                   } else{             	
+                   	$record = fgetcsv($handle, 0, ","); 
+                   		
+                   			//$keys = $record;
+                   			//$row++;
+                   			//print_r($record); 
+                       fclose($handle);
+                   			//$pass = $record['3']; 
+                   			if($record['3'] == $_POST['password']){
+                   				session_start();
+                   				$_SESSION['userinfo']=$record;
+                   				print_r($_SESSION);
+                   				//session_destroy();
                    				$obj = new form2;
+                   			
+                   				
+                   			
+                   		
+                   				//session_start();
+                   				//$_SESSION['userinfo'][]=$record;
+                   			}else{
+                   				echo 'your password is incorrect<br>';
+                   				//$_REQUEST = array();
+                   				$obj = new homepage; 
+                   				//session_start();
+                   				//$_SESSION['userinfo']=$record;
                    			}
                    		
                    		
@@ -198,13 +240,145 @@ $obj = new program;
                    			
                 }
                    	}
-                      }
-                      fclose($handle);
+                      } 
+                     /*class transactions{ 
+                      	//public $starting_ballance;
+                      	//public $current_ballance;
+                      	public $type;
+                      	public $amount;
+                      	public $source;
+
+                      	public function __construct(){
+                      		session_start();
+                      	}
+                      	public function set_type($type){
+                      		$this->type=$type; }
+                      	
+                      	
+                      	
+                      }*/
+                    
                       //$pass = array_slice($record,3,1);
                     //  echo "$pass";
-                      }
+                        
         
-                     }
-                            
+                     
+                 
+                     	class transaction  {
+                     		public $type;
+                     		public $amount;
+                     		public $source;
+                     		 
+                     		//These are seters for the transaction properties
+                     		public function setType($type) {
+                     			$this->type = $type;
+                     		}
+                     		public function setSource($source) {
+                     			$this->source = $source;
+                     		}
+                     		public function setAmount($amount) {
+                     			$this->amount = $amount;
+                     		//These are getters for the transaction
+                     		}
+                     		public function getType() {
+                     			return $this->type;
+                     		}
+                     		public function getAmount() {
+                     			return $this->amount;
+                     		}
+                     		public function getSource() {
+                     			return $this->source;
+                     		}
+                     		//This gets the whole transaction as an array
+                     		public function getTransaction() {
+                     			$transaction = array();
+                     			$transaction['type'] = $this->type;
+                     			$transaction['amount'] = $this->amount;
+                     			$transaction['source'] = $this->source;
+                     			return $transaction;
+                     		}
+                     
+                     		//This prints the transaction
+                     		public function printTransaction() {
+                     			echo '<hr>';
+                     			echo 'Transaction type: ' .   $this->type . "<br> \n";
+                     			echo 'Transaction amount: ' . $this->amount . "<br> \n";
+                     			echo 'Transaction source: ' . $this->source . "<br> \n";
+                     
+                     		}
+                     		
+                     	}
+                     	class transactions {
+                     		//this array property contains the transactions;
+                     		public $transactions = array();
+                     		public function __construct() {
+                     			//this starts the session when the object is instantiated.
+                     			session_start();
+                     	
+                     		}
+                     		//This is a method to add transactions;
+                     		public function addTransaction($type, $amount, $source) {
+                     			//This creates a new transaction
+                     			$transaction = new transaction();
+                     			//This sets the values for the transaction
+                     			$transaction->setType($type);
+                     			$transaction->setAmount($amount);
+                     			$transaction->setSource($source);
+                     			$this->source=$amount;
+                     			//This loads the trnasaction in the the transactions array that is stored in the session.
+                     			$_SESSION['transactions'][] = $transaction;
+                     			$account = new account(0);
+                     			$account->run(); 
+                     		}
+                     		//This counts the transactions
+                     		public function countTransactions() {
+                     			$count = count($this->transactions);
+                     	
+                     			return $count;
+                     		}
+                     	
+                     		//This prints the transactions
+                     		public function printTransactions() {
+                     			foreach($_SESSION['transactions'] as $transaction) {
+                     				$transaction->printTransaction();
+                     			}
+                     
+                     			}
+                     		}
+                     		class account {
+                     			public $starting_balance ;
+                     			public $current_balance;
+                     			//public $transactions = array();
+                     		
+                     		
+                     			function __construct($starting_balance) {
+                     				$this->starting_balance = $starting_balance;
+                     				$this->current_balance = $starting_balance;
+                     			}
+                     			/*public function debit($amount) {
+                     				$this->transactions[]['debit'] = $amount;
+                     			}
+                     		//	public function credit($amount) {
+                     				$this->transactions[]['credit'] = $amount;
+                     			}*/
+                     			public function run() {
+                     				echo 'Starting Balance: ' . $this->starting_balance . '<br>'. "\n";
+                     				foreach($_SESSION['transactions'] as $transaction) {
+                     					foreach($transaction as $key => $value) {
+                     						echo $key . ': ' . $value . '<br>' . "\n";
+                     						if($key == 'debit') {
+                     							//foreach( $key =='amount'){
+                     							$this->current_balance = $this->current_balance - $value;
+                     						} else {
+                     							$this->current_balance = $this->current_balance + $value;
+                     						}
+                     						 
+                     					}
+                     				}
+                     				echo 'Current Balance: ' . $this->current_balance;
+                     			}
+                     		}
+                     		
+                     		 
     ?>
                                       
