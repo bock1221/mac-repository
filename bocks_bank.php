@@ -122,16 +122,16 @@ $obj = new program;
                      				
                     <INPUT type="radio" name="type" value="debit"> Debit<BR>
                     <INPUT type="radio" name="type" value="credit"> Credit<BR>
-                  
+                  <INPUT type="checkbox" name="moretranstype" value="yes"> More Trans<BR>
                    <INPUT type="submit" value="Send"> <INPUT type="reset">
                      </P>
                      </FORM>';
 
                         echo $form;
-                       session_start();
+                      // session_start();
                        //print_r($_POST);
                        //session_start();
-                       print_r($_SESSION);
+                      // print_r($_SESSION);
                 }
                 public function post(){ 
                 	//$transactions = new transactions;
@@ -241,30 +241,13 @@ $obj = new program;
                 }
                    	}
                       } 
-                     /*class transactions{ 
-                      	//public $starting_ballance;
-                      	//public $current_ballance;
-                      	public $type;
-                      	public $amount;
-                      	public $source;
-
-                      	public function __construct(){
-                      		session_start();
-                      	}
-                      	public function set_type($type){
-                      		$this->type=$type; }
-                      	
-                      	
-                      	
-                      }*/
-                    
-                      //$pass = array_slice($record,3,1);
-                    //  echo "$pass";
+                   
                         
         
                      
                  
                      	class transaction  {
+                     		
                      		public $type;
                      		public $amount;
                      		public $source;
@@ -324,7 +307,7 @@ $obj = new program;
                      			$transaction->setType($type);
                      			$transaction->setAmount($amount);
                      			$transaction->setSource($source);
-                     			$this->source=$amount;
+                     			//$this->source=$amount;
                      			//This loads the trnasaction in the the transactions array that is stored in the session.
                      			$_SESSION['transactions'][] = $transaction;
                      			$account = new account(0);
@@ -355,29 +338,26 @@ $obj = new program;
                      				$this->starting_balance = $starting_balance;
                      				$this->current_balance = $starting_balance;
                      			}
-                     			/*public function debit($amount) {
-                     				$this->transactions[]['debit'] = $amount;
-                     			}
-                     		//	public function credit($amount) {
-                     				$this->transactions[]['credit'] = $amount;
-                     			}*/
+                     			
                      			public function run() {
                      				echo 'Starting Balance: ' . $this->starting_balance . '<br>'. "\n";
-                     				foreach($_SESSION['transactions'] as $transaction) {
-                     					foreach($transaction as $key => $value) {
-                     						echo $key . ': ' . $value . '<br>' . "\n";
-                     						if($key == 'debit') {
-                     							//foreach( $key =='amount'){
-                     							$this->current_balance = $this->current_balance - $value;
-                     						} else {
-                     							$this->current_balance = $this->current_balance + $value;
-                     						}
-                     						 
+                     				foreach($_SESSION['transactions'] as $trans) { 
+                     					$transaction=(array)$trans;
+                     					echo $transaction['type'] . ' |  ' . $transaction['source'] . ' |   '  .  $transaction['amount'] . '<br>';
+                     					if($transaction['type'] == 'debit') {
+                     						$this->current_balance = $this->current_balance - $transaction['amount'];
+                     					} else {
+                     						$this->current_balance = $this->current_balance + $transaction['amount'];
                      					}
-                     				}
-                     				echo 'Current Balance: ' . $this->current_balance;
-                     			}
-                     		}
+                     					}
+                     					
+                     					}	
+                     		 public function __destruct() {
+      echo '<br> Your starting balance was: ' . $this->starting_balance . '<br>';
+      echo 'Your ending balance is: ' . $this->current_balance . '<br>';       
+    }
+
+  }
                      		
                      		 
     ?>
