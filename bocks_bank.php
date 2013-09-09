@@ -80,7 +80,8 @@ $obj = new program;
         	     
                 public function __construct() {
                 	//print_r($_SESSION);
-                $user=$_SESSION['userinfo']; 
+                	//session_start();
+                     $user=$_SESSION['userinfo']; 
                 	$users=$user [1];  
                         echo "hi $users are now logged in" . "<br> \n";
                         echo '<a href="bocks_bank.php?class=debitcredit">New transaction</a>' . "<br> \n";
@@ -121,7 +122,7 @@ $obj = new program;
                    <INPUT type="text" name="source" id="source"><BR>
                      				
                     <INPUT type="radio" name="type" value="debit"> Debit<BR>
-                    <INPUT type="radio" name="type" value="credit"> Credit<BR>
+                    <INPUT type="radio" name="type" value="credit"> Credit
                   <INPUT type="checkbox" name="moretranstype" value="yes"> More Trans<BR>
                    <INPUT type="submit" value="Send"> <INPUT type="reset">
                      </P>
@@ -135,11 +136,27 @@ $obj = new program;
                 }
                 public function post(){ 
                 	//$transactions = new transactions;
-                $transactions =	new transactions;
+               /* $transactions =	new transactions;
                 $transactions->addTransaction($_POST['type'],$_POST['amount'],$_POST['source']);
-               print_r($_SESSION);
+                $transactions->writeTransactions();*/
+              // print_r($_SESSION);
                
-                
+               $transactions = new transactions();
+               //This line figures out if the form has more transactions by looking to see if the key exists in the POST request.
+               if(array_key_exists('moretranstype', $_POST)) {
+               	//This line adds the transaction data from the POST
+               	$transactions->addTransaction($_POST['type'],$_POST['amount'],$_POST['source']);
+               	//This line is a PHP command that will forward the request back to the form.
+               	//header('Location: bocks_bank.php?class=form2');
+               	$obj=new form2;
+               	//This else statement is run if there are no more transactions.
+               } else {
+               	//This adds the last transaction in the POST and then the next line prints the transactions;
+               	$transactions->addTransaction($_POST['type'],$_POST['amount'],$_POST['source']);
+               	//$transactions->printTransactions();
+               	$transactions->writeTransactions();
+               	
+               } 
                 
               
               
@@ -214,7 +231,7 @@ $obj = new program;
                    			if($record['3'] == $_POST['password']){
                    				session_start();
                    				$_SESSION['userinfo']=$record;
-                   				print_r($_SESSION);
+                   				//print_r($_SESSION);
                    				//session_destroy();
                    				$obj = new form2;
                    			
@@ -326,6 +343,21 @@ $obj = new program;
                      				$transaction->printTransaction();
                      			}
                      
+                     			} 
+                     			public function writeTransactions() {
+                     				session_start();
+                     				$user = $_SESSION['userinfo'];
+                     				$use = $user[2];
+                     				//This is how you open the file for writing, $fp contains the file pointer.  The directory must be writable i.e. chmod -R 777 write.  The path is relative, but it can also be absolute, it is just like if you were typing the command in the linux terminal.
+                     				$fp = fopen("write/$use.csv", 'a');
+                     				//this is looping through the transactions array stored in the session array
+                     				foreach($_SESSION['transactions'] as $transaction ) {
+                     					//This step converts the public properties of the transaction object to an array, this must be done because the function fputcsv will only take an array.  Transaction is an object and not an array prior to this step, so that transaction can have methods.  The (array) converts the object to array, this is called type casting.
+                     					$transact = (array) $transaction;
+                     					//This built in function fputcsv takes in a file pointer ($fp) and an array $transact and writes out the file.
+                     					fputcsv($fp, $transact);
+                     					session_destroy();
+                     				}
                      			}
                      		}
                      		class account {
