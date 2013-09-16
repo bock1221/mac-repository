@@ -223,12 +223,15 @@ $obj = new program;
                    	$records=$record;
                      	
                    	
-                   	$_SESSION['transactions'][]=$records;
-                   	
+                   	//$_SESSION['transactions'][]=$records;
+                   	$key=array('type','amount','source') ;
+                   	print_r($key);
+                   $action=	array_combine($key,$records);
+                   $_SESSION['transactions'][]=$action;
                    			//print_r($record); 
                       // fclose($handle);
                    		}}}
-                   		//$pass = $record['3']; 
+                   		$pass = $record['3']; 
                    			if($keys['3'] == $_POST['password']){
                    				//session_start();
                    				$_SESSION['userinfo']=$keys;
@@ -242,14 +245,13 @@ $obj = new program;
                    		
                    				//session_start();
                    				//$_SESSION['userinfo'][]=$record;
-                   			}else{
-                   				echo 'your password is incorrect<br>';
+                   			//}else{
+                   				//echo 'your password is incorrect<br>';
                    				//$_REQUEST = array();
-                   				$obj = new homepage; 
+                   				///$obj = new homepage; 
                    				//session_start();
                    				//$_SESSION['userinfo']=$record;
-              }
-                   }}
+              }}}
                    	
                       
                    
@@ -365,7 +367,7 @@ $obj = new program;
                      				echo 'Starting Balance: ' . $this->starting_balance . '<br>'. "\n";
                      				foreach($_SESSION['transactions'] as $trans) { 
                      					$transaction=(array)$trans;
-                     					echo $transaction['type'] . ' |  ' . $transaction['source'] . ' |   '  .  $transaction['amount'] . '<br>';
+                     					echo $transaction['type'] . ' |  ' . $transaction['amount'] . ' |   '  .  $transaction['source'] . '<br>';
                      					if($transaction['type'] == 'debit') {
                      						$this->current_balance = $this->current_balance - $transaction['amount'];
                      					} else {
