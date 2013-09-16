@@ -113,6 +113,7 @@ $obj = new program;
                      				
         class debitcredit extends page {
                 public function get() {
+               
                         $form = '<br>
                   <FORM action="bocks_bank.php?class=debitcredit" method="post">
                    <fieldset>
@@ -131,8 +132,8 @@ $obj = new program;
                         echo $form;
                       // session_start();
                        //print_r($_POST);
-                       //session_start();
-                      // print_r($_SESSION);
+                       session_start();
+                       print_r($_SESSION);
                 }
                 public function post(){ 
                 	//$transactions = new transactions;
@@ -155,7 +156,7 @@ $obj = new program;
                	$transactions->addTransaction($_POST['type'],$_POST['amount'],$_POST['source']);
                	//$transactions->printTransactions();
                	$transactions->writeTransactions();
-               	
+               	session_destroy();
                } 
                 
               
@@ -180,18 +181,10 @@ $obj = new program;
                  echo '<a href="bocks_bank.php?class=register">register</a>' . "<br> \n";
                  //echo '<a href="mypage_class.php?class=form2">Form 2</a>' . "<br> \n";
                  //echo '<a href="mypage_class.php">Homepage</a>' . "<br> \n";
-                 
-                 
-                
-          	}else{
+             }else{
           	
           	$id = $_POST['username'];
-          	// $car = array('firstname', 'lastname', 'username' , 'password');
-          	//// $cat = array('firstname', 'lastname', 'username' , 'password') ;
-          	// $combine =  array_combine($keys,$_POST);  
-           // print_r($_POST);
-            // $combine[]=$car;
-           //  $combine[]=$cat;
+          	
             
              if(@$handle=fopen("write/$id.csv", 'r')) {
              echo "this username is already taken";
@@ -214,23 +207,32 @@ $obj = new program;
           }
                    public function read_login(){
                    	$id =$_POST['username'];
-                   	
-                  // $row = 1;
+                   	session_start();
+                   $row = 1;
                    
                    if ((@$handle = fopen("write/$id.csv", "r")) == FALSE) { 
                    	echo 'your user name is incorrect';
                    	echo '<a href="bocks_bank.php?class=login">Login Now</a>' . "<br> \n";
-                   } else{             	
-                   	$record = fgetcsv($handle, 0, ","); 
-                   		
-                   			//$keys = $record;
-                   			//$row++;
+                   } else{ 
+                   	            	
+                   while($record = fgetcsv($handle, 0, ",")) {
+                   		if($row==1){
+                   			$keys = $record;
+                   			$row++;
+                   		}elseif($row!==FALSE){
+                   	$records=$record;
+                     	
+                   	
+                   	$_SESSION['transactions'][]=$records;
+                   	
                    			//print_r($record); 
-                       fclose($handle);
-                   			//$pass = $record['3']; 
-                   			if($record['3'] == $_POST['password']){
-                   				session_start();
-                   				$_SESSION['userinfo']=$record;
+                      // fclose($handle);
+                   		}}}
+                   		//$pass = $record['3']; 
+                   			if($keys['3'] == $_POST['password']){
+                   				//session_start();
+                   				$_SESSION['userinfo']=$keys;
+                   				//$_SESSION['transactions'][]=$records;
                    				//print_r($_SESSION);
                    				//session_destroy();
                    				$obj = new form2;
@@ -246,24 +248,12 @@ $obj = new program;
                    				$obj = new homepage; 
                    				//session_start();
                    				//$_SESSION['userinfo']=$record;
-                   			}
-                   		
-                   		
-                   			
-                   	      // print_r($pass);
-                   	       
-                   			
-                   			
-                   			
-                }
-                   	}
-                      } 
+              }
+                   }}
+                   	
+                      
                    
-                        
-        
-                     
-                 
-                     	class transaction  {
+                     class transaction  {
                      		
                      		public $type;
                      		public $amount;
@@ -345,7 +335,7 @@ $obj = new program;
                      
                      			} 
                      			public function writeTransactions() {
-                     				session_start();
+                     				//jsession_start();
                      				$user = $_SESSION['userinfo'];
                      				$use = $user[2];
                      				//This is how you open the file for writing, $fp contains the file pointer.  The directory must be writable i.e. chmod -R 777 write.  The path is relative, but it can also be absolute, it is just like if you were typing the command in the linux terminal.
@@ -356,7 +346,7 @@ $obj = new program;
                      					$transact = (array) $transaction;
                      					//This built in function fputcsv takes in a file pointer ($fp) and an array $transact and writes out the file.
                      					fputcsv($fp, $transact);
-                     					session_destroy();
+                     					//session_destroy();
                      				}
                      			}
                      		}
@@ -387,9 +377,12 @@ $obj = new program;
                      		 public function __destruct() {
       echo '<br> Your starting balance was: ' . $this->starting_balance . '<br>';
       echo 'Your ending balance is: ' . $this->current_balance . '<br>';       
-    }
+    } 
+     
+       
+        }
 
-  }
+  
                      		
                      		 
     ?>
