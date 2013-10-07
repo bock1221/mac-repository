@@ -163,7 +163,7 @@ $obj = new program;
               
                         }
         
-        }
+       }
         class writeinfo  {
                    
                    
@@ -225,9 +225,9 @@ $obj = new program;
                    	
                    	//$_SESSION['transactions'][]=$records;
                    	$key=array('type','amount','source') ;
-                   	print_r($key);
-                   $action=	array_combine($key,$records);
-                   $_SESSION['transactions'][]=$action;
+                   	//print_r($key);
+                   $article=	array_combine($key,$records);
+                   $_SESSION['transaction'][]=$article;
                    			//print_r($record); 
                       // fclose($handle);
                    		}}}
@@ -238,6 +238,8 @@ $obj = new program;
                    				//$_SESSION['transactions'][]=$records;
                    				//print_r($_SESSION);
                    				//session_destroy();
+                   				$obj = new account(0);
+                   				$obj->run();
                    				$obj = new form2;
                    			
                    				
@@ -302,7 +304,7 @@ $obj = new program;
                      	}
                      	class transactions {
                      		//this array property contains the transactions;
-                     		public $transactions = array();
+                     		//public $transactions = array();
                      		public function __construct() {
                      			//this starts the session when the object is instantiated.
                      			session_start();
@@ -320,7 +322,8 @@ $obj = new program;
                      			//This loads the trnasaction in the the transactions array that is stored in the session.
                      			$_SESSION['transactions'][] = $transaction;
                      			$account = new account(0);
-                     			$account->run(); 
+                     			$account->run();
+                     			$account->original_ballance();
                      		}
                      		//This counts the transactions
                      		public function countTransactions() {
@@ -353,32 +356,48 @@ $obj = new program;
                      			}
                      		}
                      		class account {
-                     			public $starting_balance ;
+                     			public $previous_ballance;
+                     			public $starting_balance;
                      			public $current_balance;
+                     			public $action;
                      			//public $transactions = array();
                      		
                      		
-                     			function __construct($starting_balance) {
-                     				$this->starting_balance = $starting_balance;
-                     				$this->current_balance = $starting_balance;
-                     			}
+                     			function __construct($zero) {
+                     				if(array_key_exists('starting balance',$_SESSION)){
+                     			
+                     				//$this->starting_balance = $starting_balance;
+                     				//session_start();
+                     				$this->starting_balance = $_SESSION['starting balance'];
+                     				$this->action='transactions';
+                     			}else{
+                     				$this->starting_balance=$zero;
+                     				$this->action='transaction'; 
+                     		}}
                      			
                      			public function run() {
-                     				echo 'Starting Balance: ' . $this->starting_balance . '<br>'. "\n";
-                     				foreach($_SESSION['transactions'] as $trans) { 
-                     					$transaction=(array)$trans;
-                     					echo $transaction['type'] . ' |  ' . $transaction['amount'] . ' |   '  .  $transaction['source'] . '<br>';
-                     					if($transaction['type'] == 'debit') {
-                     						$this->current_balance = $this->current_balance - $transaction['amount'];
+                     				//echo 'Starting Balance: ' . $this->starting_balance . '<br>'. "\n";
+                     				foreach($_SESSION[$this->action] as $transaction) { 
+                     					$transact=(array)$transaction;
+                     					print_r($transact);
+                     					//session_destroy();
+                     				
+                    					
+                    					echo $transact['type'] . ' |  ' . $transact['amount'] . ' |   '  .  $transaction['source'] . '<br>';
+                     					if($transact['type'] == 'debit') {
+                     						$this->starting_balance = $this->starting_balance - $transact['amount'];
                      					} else {
-                     						$this->current_balance = $this->current_balance + $transaction['amount'];
-                     					}
-                     					}
+                     						$this->starting_balance = $this->starting_balance + $transact['amount'];
+                     					}}}
                      					
-                     					}	
-                     		 public function __destruct() {
-      echo '<br> Your starting balance was: ' . $this->starting_balance . '<br>';
-      echo 'Your ending balance is: ' . $this->current_balance . '<br>';       
+
+                     						
+                     		 public function original_ballance() {
+                     		 	$this->previous_ballance=$this->starting_ballance;
+                     		 	$_SESSION['starting balance']=$this->starting_balance;
+     // echo '<br> Your starting balance was: ' . $this->starting_balance . '<br>';
+      echo 'Your starting balance is: ' . $this->starting_balance . '<br>';  
+     //session_destroy();     
     } 
      
        
